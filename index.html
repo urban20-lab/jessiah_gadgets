@@ -306,27 +306,6 @@
                     <span id="send-text">Send Verification Code</span>
                     <span id="send-loading" class="loading" style="display: none;"></span>
                 </button>
-                
-                <div class="api-url-config">
-                    <h3>Backend API Configuration</h3>
-                    <p>Enter your backend API URL (from Render):</p>
-                    <div class="api-input">
-                        <input type="text" id="api-url" placeholder="https://your-app.onrender.com">
-                        <button id="save-api-url">Save</button>
-                    </div>
-                    <div id="api-status" style="margin-top: 10px; display: none;"></div>
-                </div>
-                
-                <div class="backend-info">
-                    <h3>Backend Setup Required</h3>
-                    <p>For this to work, you need to deploy the backend to Render:</p>
-                    <ol>
-                        <li>Create a Node.js server with Express</li>
-                        <li>Add EmailJS integration</li>
-                        <li>Deploy to Render</li>
-                        <li>Enter your API URL above</li>
-                    </ol>
-                </div>
             </div>
             
             <!-- Step 2: OTP Verification -->
@@ -677,4 +656,5 @@
         });
     </script>
 </body>
+
 </html>
