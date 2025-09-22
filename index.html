@@ -410,64 +410,98 @@
             function generateOtp() {
                 return Math.floor(100000 + Math.random() * 900000).toString();
             }
+
+            // Example backend route for sending OTP
+app.post('/send-otp', async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        
+        // Validate email
+        if (!email || !email.includes('@')) {
+            return res.status(400).json({ success: false, message: 'Invalid email address' });
+        }
+        
+        // Configure your email service (Nodemailer example)
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.urbanjeremy2002@gmail.com,
+                pass: process.env.utos-atzr-oofa-phib // Use App Password for Gmail
+            }
+        });
+        
+        const mailOptions = {
+            from: process.env.urbanjeremy2002@gmail.com,
+            to: email,
+            subject: 'Your Verification Code',
+            html: `<p>Your verification code is: <strong>${otp}</strong></p>`
+        };
+        
+        await transporter.sendMail(mailOptions);
+        
+        res.json({ success: true, message: 'OTP sent successfully' });
+    } catch (error) {
+        console.error('Error sending OTP:', error);
+        res.status(500).json({ success: false, message: 'Failed to send OTP' });
+    }
+});
             
             // Function to send OTP via backend API
-            function sendOtp(email) {
-                // Show loading state
-                sendText.style.display = 'none';
-                sendLoading.style.display = 'inline-block';
-                sendOtpBtn.disabled = true;
-                
-                // Check if API URL is configured
-                const apiUrl = localStorage.getItem('api_url');
-                if (!apiUrl) {
-                    alert('Please configure your backend API URL first');
-                    sendText.style.display = 'inline-block';
-                    sendLoading.style.display = 'none';
-                    sendOtpBtn.disabled = false;
-                    return;
-                }
-                
-                // Generate OTP
-                generatedOtp = generateOtp();
-                
-                // Send request to backend
-                fetch("https://jessiah-gadgets.onrender.com/send-otp", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        email: email,
-                        otp: generatedOtp
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Show OTP step
-                        step1.classList.remove('active');
-                        step2.classList.add('active');
-                        emailDisplay.textContent = email;
-                        
-                        // Start the timer
-                        startTimer();
-                        startResendTimer();
-                    } else {
-                        alert('Failed to send OTP: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to send OTP. Please check your API URL and try again.');
-                })
-                .finally(() => {
-                    // Reset loading state
-                    sendText.style.display = 'inline-block';
-                    sendLoading.style.display = 'none';
-                    sendOtpBtn.disabled = false;
-                });
-            }
+function sendOtp(email) {
+    // Show loading state
+    sendText.style.display = 'none';
+    sendLoading.style.display = 'inline-block';
+    sendOtpBtn.disabled = true;
+    
+    // Check if API URL is configured
+    const apiUrl = localStorage.getItem('api_url') || 'https://jessiah-gadgets.onrender.com';
+    
+    // Generate OTP
+    generatedOtp = generateOtp();
+    
+    // Send request to backend with error handling
+    fetch(`${apiUrl}/send-otp`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            email: email,
+            otp: generatedOtp
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Show OTP step
+            step1.classList.remove('active');
+            step2.classList.add('active');
+            emailDisplay.textContent = email;
+            
+            // Start the timer
+            startTimer();
+            startResendTimer();
+        } else {
+            alert('Failed to send OTP: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to send OTP. Please check your backend configuration. Error: ' + error.message);
+    })
+    .finally(() => {
+        // Reset loading state
+        sendText.style.display = 'inline-block';
+        sendLoading.style.display = 'none';
+        sendOtpBtn.disabled = false;
+    });
+}
             
             // Function to verify OTP via backend API
             function verifyOtp(otp, email) {
@@ -652,10 +686,32 @@
                         moveToPreviousInput(input);
                     }
                 });
+                // Add this function to test your backend connection
+function testBackendConnection() {
+    const apiUrl = localStorage.getItem('api_url') || 'https://jessiah-gadgets.onrender.com';
+    
+    fetch(`${apiUrl}/health-check` || `${apiUrl}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        console.log('Backend status:', response.status);
+        return response.text();
+    })
+    .then(text => {
+        console.log('Backend response:', text);
+    })
+    .catch(error => {
+        console.error('Backend connection failed:', error);
+    });
+}
+
+// Call this when the page loads
+testBackendConnection();
             });
         });
     </script>
 </body>
-
 </html>
-
